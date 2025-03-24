@@ -13,6 +13,7 @@
   "author": "Michael J. Radwin",
   "license": "BSD-2-Clause",
   "dependencies": {
+    "@hebcal/core": "^5.9.1",
     "@hebcal/hdate": "^0.13.6",
     "@modelcontextprotocol/sdk": "^1.7.0",
     "dayjs": "^1.11.13",
