@@ -16,6 +16,7 @@
   "dependencies": {
     "@hebcal/core": "^5.10.0",
     "@hebcal/hdate": "^0.14.2",
+    "@hebcal/learning": "^6.4.3",
     "@modelcontextprotocol/sdk": "^1.13.0",
     "dayjs": "^1.11.13",
     "express": "^5.1.0",

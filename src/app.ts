@@ -1,10 +1,22 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { HDate, getYahrzeitHD } from "@hebcal/hdate";
-import { Sedra, ParshaEvent, getHolidaysOnDate, flags } from "@hebcal/core";
+import { Sedra, ParshaEvent, getHolidaysOnDate, flags, DailyLearning } from "@hebcal/core";
+import '@hebcal/learning';
 import dayjs from "dayjs";
 
 const reIsoDate = /^\d\d\d\d-\d\d-\d\d/;
+
+function errorCard(message: string): any {
+  return {
+    content: [
+      {
+        type: "text",
+        text: message,
+      }
+    ]
+  }
+}
 
 /**
  * Parse a string YYYY-MM-DD and return Date
@@ -90,7 +102,7 @@ export function getServer(): McpServer {
 
   server.tool(
     "convert-gregorian-to-hebrew",
-    "Converts a Gregorian (civil) date to a Hebrew date (Jewish calendar)",
+    "Converts a Gregorian (civil) date (in yyyy-MM-dd format) to a Hebrew date (Jewish calendar)",
     {
       date: z.string().describe('Gregorian date to convert'),
     },
@@ -99,14 +111,7 @@ export function getServer(): McpServer {
       try {
         dt = isoDateStringToDate(date);
       } catch (e) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error parsing date: ${date}`,
-            }
-          ]
-        }
+        return errorCard(`Error parsing date: ${date}`);
       }
       const hd = new HDate(dt);
       const results = [
@@ -140,14 +145,7 @@ export function getServer(): McpServer {
       try {
         monthNum = HDate.monthFromName(month);
       } catch (err) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Cannot interpret "${month}" as a Hebrew month name.`,
-            },
-          ],
-        };
+        return errorCard(`Cannot interpret "${month}" as a Hebrew month name`);
       }
 
       const hd = new HDate(day, monthNum, year);
@@ -166,7 +164,7 @@ export function getServer(): McpServer {
 
   server.tool(
     "yahrzeit",
-    "Calculates the Yahrzeit, the anniversary of the day of death of a loved one, according to the Hebrew calendar",
+    "Calculates the Yahrzeit, the anniversary of the day of death of a loved one, according to the Hebrew calendar for a specified date (in yyyy-MM-dd format)",
     {
       date: z.string().describe('Gregorian date of death'),
       afterSunset: z.boolean().describe('after sunset')
@@ -176,14 +174,7 @@ export function getServer(): McpServer {
       try {
         dt = isoDateStringToDate(date);
       } catch (e) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error parsing date: ${date}`,
-            }
-          ]
-        };
+        return errorCard(`Error parsing date: ${date}`);
       }
 
       let results: string[] = doYahrzeit(dt, afterSunset);
@@ -191,14 +182,7 @@ export function getServer(): McpServer {
         const now = new HDate();
         const startYear = now.getFullYear();
         const endYear = startYear + 3;
-        return {
-          content: [
-            {
-              type: "text",
-              text: `No yahrzeit available for: ${date} in Hebrew years ${startYear}-${endYear}`,
-            }
-          ]
-        };
+        return errorCard(`No yahrzeit available for: ${date} in Hebrew years ${startYear}-${endYear}`);
       }
 
       return {
@@ -214,7 +198,7 @@ export function getServer(): McpServer {
 
   server.tool(
     "torah-portion",
-    "Calculates the weekly Torah portion (also called parashat haShavua)",
+    "Calculates the weekly Torah portion (also called parashat haShavua) for a specified date (in yyyy-MM-dd format)",
     {
       date: z.string().describe('Gregorian date'),
       il: z.boolean().describe('True if in Israel, false for Diaspora')
@@ -224,14 +208,7 @@ export function getServer(): McpServer {
       try {
         dt = isoDateStringToDate(date);
       } catch (e) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error parsing date: ${date}`,
-            }
-          ]
-        }
+        return errorCard(`Error parsing date: ${date}`);
       }
 
       const lines = torahPortion(dt, il);
@@ -242,6 +219,42 @@ export function getServer(): McpServer {
             text: lines.join('\n'),
           }
         ]
+      };
+    },
+  );
+
+  server.tool(
+    "daf-yomi",
+    "Calculates the Daf Yomi (Babylonian Talmud) learning for a specified date (in yyyy-MM-dd format)",
+    {
+      date: z.string().describe('Gregorian date to convert'),
+    },
+    async ({ date }) => {
+      let dt;
+      try {
+        dt = isoDateStringToDate(date);
+      } catch (e) {
+        return errorCard(`Error parsing date: ${date}`);
+      }
+      const hd = new HDate(dt);
+      const ev = DailyLearning.lookup('dafYomi', hd, false);
+      if (!ev) {
+        return errorCard(`Can't find Daf Yomi for date: ${date}`);
+      };
+      const results = [
+        `Daf Yomi (English): ${ev.renderBrief('en')}`,
+        `Daf Yomi (Hebrew): ${ev.renderBrief('he')}`,
+        `Hebrew date: ${hd.toString()}`,
+        `Read the text of the Daf at: ${ev.url()}`,
+      ];
+      return {
+        content: [
+          {
+            type: "text",
+            uri: ev.url(),
+            text: results.join('\n'),
+          },
+        ],
       };
     },
   );

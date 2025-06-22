@@ -8,7 +8,10 @@ const app = express();
 
 const logDir = process.env.NODE_ENV === 'production' ? '/var/log/hebcal' : '.';
 const logger = makeLogger(logDir);
-app.use(pinoHttp({logger: logger}));
+app.use(pinoHttp({
+  logger: logger,
+  autoLogging: false,
+}));
 
 logger.info('Express server: starting up');
 logMemoryUsage(logger);
@@ -18,23 +21,24 @@ setInterval(() => {
 
 app.use(express.json());
 
+// reuse MCP server
+const server = getServer(); 
+
 app.post('/mcp', async (req: Request, res: Response) => {
   // In stateless mode, create a new instance of transport and server for each request
   // to ensure complete isolation. A single instance would cause request ID collisions
   // when multiple clients connect concurrently.
   
   try {
-    const server = getServer(); 
     const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
     });
     res.on('close', () => {
       transport.close();
-      server.close();
     });
     await server.connect(transport);
-    req.log.info({ body: req.body });
     await transport.handleRequest(req, res, req.body);
+    req.log.info({ body: req.body });
   } catch (error) {
     req.log.error(error, 'Error handling MCP request');
     if (!res.headersSent) {
