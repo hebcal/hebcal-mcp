@@ -1,8 +1,21 @@
 import express, { Request, Response } from 'express';
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { getServer } from './app.js';
+import { makeLogger, logMemoryUsage } from './logger.js';
+import pinoHttp from 'pino-http';
 
 const app = express();
+
+const logDir = process.env.NODE_ENV === 'production' ? '/var/log/hebcal' : '.';
+const logger = makeLogger(logDir);
+app.use(pinoHttp({logger: logger}));
+
+logger.info('Express server: starting up');
+logMemoryUsage(logger);
+setInterval(() => {
+  logMemoryUsage(logger);
+}, 30000);
+
 app.use(express.json());
 
 app.post('/mcp', async (req: Request, res: Response) => {
@@ -16,14 +29,14 @@ app.post('/mcp', async (req: Request, res: Response) => {
       sessionIdGenerator: undefined,
     });
     res.on('close', () => {
-      console.log('Request closed');
       transport.close();
       server.close();
     });
     await server.connect(transport);
+    req.log.info({ body: req.body });
     await transport.handleRequest(req, res, req.body);
   } catch (error) {
-    console.error('Error handling MCP request:', error);
+    req.log.error(error, 'Error handling MCP request');
     if (!res.headersSent) {
       res.status(500).json({
         jsonrpc: '2.0',
@@ -38,7 +51,7 @@ app.post('/mcp', async (req: Request, res: Response) => {
 });
 
 app.get('/mcp', async (req: Request, res: Response) => {
-  console.log('Received GET MCP request');
+  req.log.info('Received GET MCP request');
   res.writeHead(405).end(JSON.stringify({
     jsonrpc: "2.0",
     error: {
@@ -50,7 +63,7 @@ app.get('/mcp', async (req: Request, res: Response) => {
 });
 
 app.delete('/mcp', async (req: Request, res: Response) => {
-  console.log('Received DELETE MCP request');
+  req.log.info('Received DELETE MCP request');
   res.writeHead(405).end(JSON.stringify({
     jsonrpc: "2.0",
     error: {
@@ -64,5 +77,7 @@ app.delete('/mcp', async (req: Request, res: Response) => {
 // Start the server
 const port = process.env.NODE_PORT || 8080;
 app.listen(port, () => {
-  console.log(`MCP Stateless Streamable HTTP Server listening on port ${port}`);
+  const msg = `express listening on port ${port}`;
+  logger.info(msg);
+  console.log(msg);
 });
