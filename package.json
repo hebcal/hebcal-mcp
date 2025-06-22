@@ -13,14 +13,14 @@
   "author": "Michael J. Radwin",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "@hebcal/core": "^5.9.1",
-    "@hebcal/hdate": "^0.13.6",
-    "@modelcontextprotocol/sdk": "^1.7.0",
+    "@hebcal/core": "^5.10.0",
+    "@hebcal/hdate": "^0.14.2",
+    "@modelcontextprotocol/sdk": "^1.13.0",
     "dayjs": "^1.11.13",
-    "zod": "^3.24.2"
+    "zod": "^3.25.67"
   },
   "devDependencies": {
-    "@types/node": "^22.13.11",
-    "typescript": "^5.8.2"
+    "@types/node": "^24.0.3",
+    "typescript": "^5.8.3"
   }
 }
