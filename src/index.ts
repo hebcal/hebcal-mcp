@@ -1,5 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { SseServerTransport } from "./sse-transport.js";
+import express from "express";
 import { z } from "zod";
 import { HDate, getYahrzeitHD } from "@hebcal/hdate";
 import { Sedra, ParshaEvent, getHolidaysOnDate, flags } from "@hebcal/core";
@@ -233,9 +235,77 @@ server.tool(
 );
 
 async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Hebcal MCP Server running on stdio");
+  const transportMode = process.env.MCP_TRANSPORT || (process.argv.includes("--sse") ? "sse" : "stdio");
+  const port = process.env.PORT || 3000;
+
+  if (transportMode === "sse") {
+    const app = express();
+    app.get("/mcp", (req, res) => {
+      const transport = new SseServerTransport(req, res);
+      server.connect(transport);
+      console.error(`Hebcal MCP Server connected via SSE on /mcp`);
+
+      // Keep the connection alive by sending a comment every 20 seconds
+      const keepAliveInterval = setInterval(() => {
+        if (res.writableEnded) {
+          clearInterval(keepAliveInterval);
+          return;
+        }
+        res.write(": keepalive\n\n");
+      }, 20000);
+
+      req.on("close", () => {
+        clearInterval(keepAliveInterval);
+        console.error("SSE connection closed by client");
+        transport.close();
+      });
+    });
+
+    // Temporary test route for SSE
+    app.get("/test-tool", async (_req, res) => {
+      const testRequestId = `test-${Date.now()}`;
+      const callToolRequest = {
+        jsonrpc: "2.0",
+        id: testRequestId,
+        method: "callTool",
+        params: {
+          name: "convert-gregorian-to-hebrew",
+          arguments: {
+            date: "2024-03-10", // Example date
+          },
+        },
+      };
+
+      try {
+        // Accessing the internal 'server' instance of McpServer to use its receiveMessage.
+        // This simulates an incoming request from a client.
+        // The McpServer should then process this and send the response via any connected transport (like SSE).
+        // @ts-expect-error McpServer.server is the underlying JSONRPCServer instance and is not meant for public use
+        server.server.receiveMessage(callToolRequest, {
+          // Mock any 'extra' context if needed by receiveMessage or subsequent handlers
+          // For SseServerTransport, it doesn't use 'extra' for incoming messages processing
+        });
+
+        res.json({ status: `Test tool request '${testRequestId}' sent to McpServer. Check SSE stream for response.` });
+      } catch (error) {
+        console.error("Error in /test-tool:", error);
+        if (error instanceof Error) {
+          res.status(500).send(`Error sending test tool request: ${error.message}`);
+        } else {
+          res.status(500).send("Unknown error sending test tool request");
+        }
+      }
+    });
+
+    app.listen(port, () => {
+      console.error(`Hebcal MCP Server with SSE running on http://localhost:${port}/mcp`);
+      console.error(`SSE test tool endpoint available at http://localhost:${port}/test-tool`);
+    });
+  } else {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Hebcal MCP Server running on stdio");
+  }
 }
 
 main().catch((error) => {
