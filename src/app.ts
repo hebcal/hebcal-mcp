@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { HDate, getYahrzeitHD } from "@hebcal/hdate";
-import { Sedra, ParshaEvent, getHolidaysOnDate, flags, DailyLearning } from "@hebcal/core";
+import { HebrewCalendar, Sedra, ParshaEvent, getHolidaysOnDate, flags, DailyLearning } from "@hebcal/core";
 import '@hebcal/learning';
 import dayjs from "dayjs";
 
@@ -102,9 +102,9 @@ export function getServer(): McpServer {
 
   server.tool(
     "convert-gregorian-to-hebrew",
-    "Converts a Gregorian (civil) date (in yyyy-MM-dd format) to a Hebrew date (Jewish calendar)",
+    "Converts a Gregorian (civil) date to a Hebrew date (Jewish calendar)",
     {
-      date: z.string().describe('Gregorian date to convert'),
+      date: z.string().describe('Gregorian date (in yyyy-MM-dd format) to convert'),
     },
     async ({ date }) => {
       let dt;
@@ -164,9 +164,9 @@ export function getServer(): McpServer {
 
   server.tool(
     "yahrzeit",
-    "Calculates the Yahrzeit, the anniversary of the day of death of a loved one, according to the Hebrew calendar for a specified date (in yyyy-MM-dd format)",
+    "Calculates the Yahrzeit, the anniversary of the day of death of a loved one, according to the Hebrew calendar for a specified date",
     {
-      date: z.string().describe('Gregorian date of death'),
+      date: z.string().describe('Gregorian date of death (in yyyy-MM-dd format)'),
       afterSunset: z.boolean().describe('after sunset')
     },
     async ({ date, afterSunset }) => {
@@ -198,9 +198,9 @@ export function getServer(): McpServer {
 
   server.tool(
     "torah-portion",
-    "Calculates the weekly Torah portion (also called parashat haShavua) for a specified date (in yyyy-MM-dd format)",
+    "Calculates the weekly Torah portion (also called parashat haShavua) for a specified date",
     {
-      date: z.string().describe('Gregorian date'),
+      date: z.string().describe('Gregorian date in yyyy-MM-dd format'),
       il: z.boolean().describe('True if in Israel, false for Diaspora')
     },
     async ({ date, il }) => {
@@ -224,10 +224,42 @@ export function getServer(): McpServer {
   );
 
   server.tool(
-    "daf-yomi",
-    "Calculates the Daf Yomi (Babylonian Talmud) learning for a specified date (in yyyy-MM-dd format)",
+    "jewish-holidays-year",
+    "Calculates a list of all Jewish holidays during a Gregorian (civil) year",
     {
-      date: z.string().describe('Gregorian date to convert'),
+      year: z.number().int().min(1).max(9999).describe('Gregorian year'),
+    },
+    async ({ year }) => {
+      const events = HebrewCalendar.calendar({
+        year: year,
+        isHebrewYear: false,
+      });
+      const lines: string[] = [
+        '| Gregorian date | Hebrew date | Holiday | Categories |',
+        '| ---- | ---- | ---- | ---- |',
+      ];
+      for (const ev of events) {
+        const hd = ev.getDate();
+        const d = dayjs(hd.greg());
+        const cats = ev.getCategories().filter(cat => cat !== 'holiday');
+        lines.push(`| ${d.format('YYYY-MM-DD')} | ${hd.toString()} | ${ev.render('en')} | ${cats.join(', ')} |`);
+      }
+      return {
+        content: [
+          {
+            type: "text",
+            text: lines.join('\n'),
+          },
+        ],
+      };
+    },
+  );
+
+  server.tool(
+    "daf-yomi",
+    "Calculates the Daf Yomi (Babylonian Talmud) learning for a specified date",
+    {
+      date: z.string().describe('Gregorian date in yyyy-MM-dd format'),
     },
     async ({ date }) => {
       let dt;
