@@ -43,8 +43,9 @@ function doYahrzeit(dt: Date, afterSunset: boolean): string[] {
   const origHyear = origHd.getFullYear();
 
   const now = new HDate();
-  const startYear = now.getFullYear();
-  const endYear = startYear + 3;
+  const nowYear = now.getFullYear();
+  const startYear = nowYear - 2;
+  const endYear = nowYear + 20;
   const hdates = [];
   for (let hyear = startYear; hyear <= endYear; hyear++) {
     const anniversary = getYahrzeitHD(hyear, origHd);
@@ -54,22 +55,17 @@ function doYahrzeit(dt: Date, afterSunset: boolean): string[] {
     }
   }
 
-  let results: string[] = [];
+  const lines: string[] = [
+    '| Anniversary number | Gregorian date | Hebrew year | Hebrew day and month | Date in Hebrew letters |',
+    '| ---- | ---- | ---- | ---- | ---- |',
+  ];
   for (const hd of hdates) {
     const hyear = hd.getFullYear();
     const yearNumber = hyear - origHyear;
     const d = dayjs(hd.greg());
-    const summary = [
-      `Anniversary number: ${yearNumber}`,
-      `Gregorian Date of Yahrzeit: ${d.format('YYYY-MM-DD')}`,
-      `Hebrew year: ${hyear}`,
-      `Hebrew month: ${hd.getMonthName()}`,
-      `Day of Hebrew month: ${hd.getDate()}`,
-      `Date in Hebrew letters: ${hd.renderGematriya()}`,
-    ];
-    results = results.concat(...summary, '');
+    lines.push(`| ${yearNumber} | ${d.format('YYYY-MM-DD')} | ${hyear} | ${hd.render('en', false)} | ${hd.renderGematriya()} |`);
   }
-  return results;
+  return lines;
 }
 
 function torahPortion(dt: Date, il: boolean): string[] {
