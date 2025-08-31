@@ -4,7 +4,7 @@ export function makeLogger(logDir: string): Logger {
   const transport = pino.transport({
     target: 'pino/file',
     level: process.env.NODE_ENV == 'production' ? 'info' : 'debug',
-    options: {destination: logDir + '/access.log'},
+    options: {destination: logDir + '/mcp.log'},
   });
   const logger = pino(transport);
 
