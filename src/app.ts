@@ -93,7 +93,7 @@ function torahPortion(dt: Date, il: boolean): string[] {
 export function getServer(): McpServer {
   const server = new McpServer({
     name: "hebcal",
-    version: "1.0.0",
+    version: "1.0.1",
   });
 
   server.tool(
