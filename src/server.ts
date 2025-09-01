@@ -54,28 +54,24 @@ app.post('/mcp', async (req: Request, res: Response) => {
   }
 });
 
-app.get('/mcp', async (req: Request, res: Response) => {
-  req.log.info('Received GET MCP request');
+async function notAllowed(req: Request, res: Response) {
+  req.log.info(`Received ${req.method} MCP request`);
   res.writeHead(405).end(JSON.stringify({
     jsonrpc: "2.0",
     error: {
       code: -32000,
-      message: "Method not allowed."
+      message: `Method ${req.method} not allowed`
     },
     id: null
   }));
-});
+}
 
-app.delete('/mcp', async (req: Request, res: Response) => {
-  req.log.info('Received DELETE MCP request');
-  res.writeHead(405).end(JSON.stringify({
-    jsonrpc: "2.0",
-    error: {
-      code: -32000,
-      message: "Method not allowed."
-    },
-    id: null
-  }));
+app.get('/mcp', notAllowed);
+app.delete('/mcp', notAllowed);
+
+app.get('/ping', (req, res) => {
+  // will return 404 if it's not there
+  res.sendFile('/var/www/html/ping');
 });
 
 // Start the server
