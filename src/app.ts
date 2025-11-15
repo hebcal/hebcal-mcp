@@ -77,7 +77,7 @@ function torahPortion(dt: Date, il: boolean): string[] {
   const lines: string[] = [];
   lines.push(`Torah portion: ${parshaName}`);
   if (!parsha.chag) {
-    const pe = new ParshaEvent(parsha.hdate, parsha.parsha, il, parsha.num);
+    const pe = new ParshaEvent(parsha);
     lines.push(`Name in Hebrew: ${pe.render('he')}`);
     const holidays = getHolidaysOnDate(parsha.hdate, il) || [];
     const special = holidays.filter((ev) => ev.getFlags() & flags.SPECIAL_SHABBAT);
