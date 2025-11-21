@@ -14,7 +14,7 @@
   "author": "Michael J. Radwin",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "@hebcal/core": "^6.0.5",
+    "@hebcal/core": "^6.0.6",
     "@hebcal/hdate": "^0.21.1",
     "@hebcal/learning": "^6.6.0",
     "@modelcontextprotocol/sdk": "^1.17.4",

@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { getServer } from './app.js';
-import { makeLogger, logMemoryUsage } from './logger.js';
+import { makeLogger } from './logger.js';
 import pinoHttp from 'pino-http';
 
 const app = express();
@@ -14,10 +14,6 @@ app.use(pinoHttp({
 }));
 
 logger.info('Express server: starting up');
-logMemoryUsage(logger);
-setInterval(() => {
-  logMemoryUsage(logger);
-}, 30000);
 
 app.use(express.json());
 
