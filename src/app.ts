@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { HDate, getYahrzeitHD } from "@hebcal/hdate";
 import { HebrewCalendar, Sedra, ParshaEvent, getHolidaysOnDate, flags, DailyLearning } from "@hebcal/core";
+import { getLeyningForParshaHaShavua } from '@hebcal/leyning';
 import '@hebcal/learning';
 import dayjs from "dayjs";
 
@@ -79,6 +80,8 @@ function torahPortion(dt: Date, il: boolean): string[] {
   if (!parsha.chag) {
     const pe = new ParshaEvent(parsha);
     lines.push(`Name in Hebrew: ${pe.render('he')}`);
+    const reading = getLeyningForParshaHaShavua(pe, pe.p.il);
+    lines.push(`Reading: ${reading.summary}`);
     const holidays = getHolidaysOnDate(parsha.hdate, il) || [];
     const special = holidays.filter((ev) => ev.getFlags() & flags.SPECIAL_SHABBAT);
     if (special.length) {
