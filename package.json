@@ -20,7 +20,7 @@
     "@hebcal/leyning": "^9.3.0",
     "@modelcontextprotocol/sdk": "^1.17.4",
     "dayjs": "^1.11.19",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "pino": "^10.1.0",
     "pino-http": "^11.0.0",
     "zod": "^3.25.75"
