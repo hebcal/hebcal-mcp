@@ -50,7 +50,7 @@ export function doYahrzeit(dt: Date, afterSunset: boolean): string[] {
   const hdates = [];
   for (let hyear = startYear; hyear <= endYear; hyear++) {
     const anniversary = getYahrzeitHD(hyear, origHd);
-    if (typeof anniversary !== 'undefined') {
+    if (anniversary) {
       const hd = new HDate(anniversary);
       hdates.push(hd);
     }
@@ -99,17 +99,19 @@ export function getServer(): McpServer {
     version: "1.0.1",
   });
 
-  server.tool(
+  server.registerTool(
     "convert-gregorian-to-hebrew",
-    "Converts a Gregorian (civil) date to a Hebrew date (Jewish calendar)",
     {
-      date: z.string().describe('Gregorian date (in yyyy-MM-dd format) to convert'),
+      description: "Converts a Gregorian (civil) date to a Hebrew date (Jewish calendar)",
+      inputSchema: {
+        date: z.string().describe('Gregorian date (in yyyy-MM-dd format) to convert'),
+      },
     },
-    async ({ date }) => {
+    async function ({ date }) {
       let dt;
       try {
         dt = isoDateStringToDate(date);
-      } catch (e) {
+      } catch {
         return errorCard(`Error parsing date: ${date}`);
       }
       const hd = new HDate(dt);
@@ -131,19 +133,21 @@ export function getServer(): McpServer {
     },
   );
 
-  server.tool(
+  server.registerTool(
     "convert-hebrew-to-gregorian",
-    "Converts a Hebrew date to a Gregorian (civil) date",
     {
-      day: z.number().int().min(1).max(30).describe('Hebrew day of month'),
-      month: z.string().describe('Hebrew month name transliterated, like Elul or Tishrei'),
-      year: z.number().int().min(1).max(9999).describe('Hebrew year'),
+      description: "Converts a Hebrew date to a Gregorian (civil) date",
+      inputSchema: {
+        day: z.number().int().min(1).max(30).describe('Hebrew day of month'),
+        month: z.string().describe('Hebrew month name transliterated, like Elul or Tishrei'),
+        year: z.number().int().min(1).max(9999).describe('Hebrew year'),
+      },
     },
     async ({ day, month, year }) => {
       let monthNum: number;
       try {
         monthNum = HDate.monthFromName(month);
-      } catch (err) {
+      } catch {
         return errorCard(`Cannot interpret "${month}" as a Hebrew month name`);
       }
 
@@ -161,18 +165,20 @@ export function getServer(): McpServer {
     },
   );
 
-  server.tool(
+  server.registerTool(
     "yahrzeit",
-    "Calculates the Yahrzeit, the anniversary of the day of death of a loved one, according to the Hebrew calendar for a specified date",
     {
-      date: z.string().describe('Gregorian date of death (in yyyy-MM-dd format)'),
-      afterSunset: z.boolean().describe('after sunset')
+      description: "Calculates the Yahrzeit, the anniversary of the day of death of a loved one, according to the Hebrew calendar for a specified date",
+      inputSchema: {
+        date: z.string().describe('Gregorian date of death (in yyyy-MM-dd format)'),
+        afterSunset: z.boolean().describe('after sunset')
+      },
     },
     async ({ date, afterSunset }) => {
       let dt;
       try {
         dt = isoDateStringToDate(date);
-      } catch (e) {
+      } catch {
         return errorCard(`Error parsing date: ${date}`);
       }
 
@@ -195,18 +201,20 @@ export function getServer(): McpServer {
     },
   );
 
-  server.tool(
+  server.registerTool(
     "torah-portion",
-    "Calculates the weekly Torah portion (also called parashat haShavua) for a specified date",
     {
-      date: z.string().describe('Gregorian date in yyyy-MM-dd format'),
-      il: z.boolean().describe('True if in Israel, false for Diaspora')
+      description: "Calculates the weekly Torah portion (also called parashat haShavua) for a specified date",
+      inputSchema: {
+        date: z.string().describe('Gregorian date in yyyy-MM-dd format'),
+        il: z.boolean().describe('True if in Israel, false for Diaspora')
+      },
     },
     async ({ date, il }) => {
       let dt;
       try {
         dt = isoDateStringToDate(date);
-      } catch (e) {
+      } catch {
         return errorCard(`Error parsing date: ${date}`);
       }
 
@@ -222,11 +230,13 @@ export function getServer(): McpServer {
     },
   );
 
-  server.tool(
+  server.registerTool(
     "jewish-holidays-year",
-    "Calculates a list of all Jewish holidays during a Gregorian (civil) year",
     {
-      year: z.number().int().min(1).max(9999).describe('Gregorian year'),
+      description: "Calculates a list of all Jewish holidays during a Gregorian (civil) year",
+      inputSchema: {
+        year: z.number().int().min(1).max(9999).describe('Gregorian year'),
+      },
     },
     async ({ year }) => {
       const events = HebrewCalendar.calendar({
@@ -254,17 +264,19 @@ export function getServer(): McpServer {
     },
   );
 
-  server.tool(
+  server.registerTool(
     "daf-yomi",
-    "Calculates the Daf Yomi (Babylonian Talmud) learning for a specified date",
     {
-      date: z.string().describe('Gregorian date in yyyy-MM-dd format'),
+      description: "Calculates the Daf Yomi (Babylonian Talmud) learning for a specified date",
+      inputSchema: {
+        date: z.string().describe('Gregorian date in yyyy-MM-dd format'),
+      },
     },
     async ({ date }) => {
       let dt;
       try {
         dt = isoDateStringToDate(date);
-      } catch (e) {
+      } catch {
         return errorCard(`Error parsing date: ${date}`);
       }
       const hd = new HDate(dt);
