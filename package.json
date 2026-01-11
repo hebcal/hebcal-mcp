@@ -1,6 +1,6 @@
 {
   "name": "@hebcal/mcp",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "description": "Model Context Protocol extension for Hebrew calendar",
   "type": "module",
   "main": "server.js",

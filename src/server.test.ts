@@ -82,7 +82,7 @@ describe('MCP Server HTTP Integration Tests', () => {
       expect(jsonrpcMessage).toHaveProperty('result');
       expect(jsonrpcMessage.result).toHaveProperty('tools');
       expect(Array.isArray(jsonrpcMessage.result.tools)).toBe(true);
-      expect(jsonrpcMessage.result.tools.length).toBe(6);
+      expect(jsonrpcMessage.result.tools.length).toBe(7);
 
       const toolNames = jsonrpcMessage.result.tools.map((t: any) => t.name);
       expect(toolNames).toContain('convert-gregorian-to-hebrew');
@@ -91,6 +91,7 @@ describe('MCP Server HTTP Integration Tests', () => {
       expect(toolNames).toContain('torah-portion');
       expect(toolNames).toContain('jewish-holidays-year');
       expect(toolNames).toContain('daf-yomi');
+      expect(toolNames).toContain('candle-lighting');
     });
 
     it('should convert Gregorian to Hebrew date', async () => {
@@ -262,6 +263,39 @@ describe('MCP Server HTTP Integration Tests', () => {
       expect(jsonrpcMessage.result.content[0].text).toContain('Daf Yomi (English):');
       expect(jsonrpcMessage.result.content[0].text).toContain('Hebrew date:');
     });
+
+    it('should get candle-lighting times for a location', async () => {
+      const response = await request(app)
+        .post('/mcp')
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json, text/event-stream')
+        .send({
+          jsonrpc: '2.0',
+          method: 'tools/call',
+          params: {
+            name: 'candle-lighting',
+            arguments: {
+              latitude: 41.85003,
+              longitude: -87.65005,
+              tzid: 'America/Chicago',
+              startDate: '2024-01-05',
+              endDate: '2024-01-13',
+            },
+          },
+          id: 8,
+        })
+        .expect(200);
+
+      const jsonrpcMessage = parseSSE(response.text);
+      expect(jsonrpcMessage).toBeTruthy();
+      expect(jsonrpcMessage).toHaveProperty('jsonrpc', '2.0');
+      expect(jsonrpcMessage).toHaveProperty('id', 8);
+      expect(jsonrpcMessage).toHaveProperty('result');
+      expect(jsonrpcMessage.result.content[0].text).toContain('Candle lighting');
+      expect(jsonrpcMessage.result.content[0].text).toContain('Havdalah');
+      expect(jsonrpcMessage.result.content[0].text).toContain('Date');
+      expect(jsonrpcMessage.result.content[0].text).toContain('Time');
+    });
   });
 
   describe('Error Handling', () => {
@@ -279,14 +313,14 @@ describe('MCP Server HTTP Integration Tests', () => {
               date: 'invalid-date',
             },
           },
-          id: 8,
+          id: 9,
         })
         .expect(200);
 
       const jsonrpcMessage = parseSSE(response.text);
       expect(jsonrpcMessage).toBeTruthy();
       expect(jsonrpcMessage).toHaveProperty('jsonrpc', '2.0');
-      expect(jsonrpcMessage).toHaveProperty('id', 8);
+      expect(jsonrpcMessage).toHaveProperty('id', 9);
       expect(jsonrpcMessage).toHaveProperty('result');
       expect(jsonrpcMessage.result.content[0].text).toContain('Error parsing date');
     });
@@ -307,14 +341,14 @@ describe('MCP Server HTTP Integration Tests', () => {
               year: 5784,
             },
           },
-          id: 9,
+          id: 10,
         })
         .expect(200);
 
       const jsonrpcMessage = parseSSE(response.text);
       expect(jsonrpcMessage).toBeTruthy();
       expect(jsonrpcMessage).toHaveProperty('jsonrpc', '2.0');
-      expect(jsonrpcMessage).toHaveProperty('id', 9);
+      expect(jsonrpcMessage).toHaveProperty('id', 10);
       expect(jsonrpcMessage).toHaveProperty('result');
       expect(jsonrpcMessage.result.content[0].text).toContain('Cannot interpret');
     });
@@ -331,14 +365,14 @@ describe('MCP Server HTTP Integration Tests', () => {
             name: 'non-existent-tool',
             arguments: {},
           },
-          id: 10,
+          id: 11,
         })
         .expect(200);
 
       const jsonrpcMessage = parseSSE(response.text);
       expect(jsonrpcMessage).toBeTruthy();
       expect(jsonrpcMessage).toHaveProperty('jsonrpc', '2.0');
-      expect(jsonrpcMessage).toHaveProperty('id', 10);
+      expect(jsonrpcMessage).toHaveProperty('id', 11);
       // Should have an error property for unknown tool
       expect(jsonrpcMessage.error || jsonrpcMessage.result).toBeTruthy();
     });
@@ -353,7 +387,7 @@ describe('MCP Server HTTP Integration Tests', () => {
         .send({
           jsonrpc: '2.0',
           method: 'tools/list',
-          id: 11,
+          id: 12,
         })
         .expect(200)
         .expect('Content-Type', /text\/event-stream/);
@@ -361,7 +395,7 @@ describe('MCP Server HTTP Integration Tests', () => {
       const jsonrpcMessage = parseSSE(response.text);
       expect(jsonrpcMessage).toBeTruthy();
       expect(jsonrpcMessage).toHaveProperty('jsonrpc', '2.0');
-      expect(jsonrpcMessage).toHaveProperty('id', 11);
+      expect(jsonrpcMessage).toHaveProperty('id', 12);
       expect(jsonrpcMessage.result || jsonrpcMessage.error).toBeTruthy();
     });
 
@@ -396,7 +430,7 @@ describe('MCP Server HTTP Integration Tests', () => {
               afterSunset: false,
             },
           },
-          id: 12,
+          id: 13,
         })
         .expect(200);
 
@@ -419,7 +453,7 @@ describe('MCP Server HTTP Integration Tests', () => {
               year: 2024,
             },
           },
-          id: 13,
+          id: 14,
         })
         .expect(200);
 

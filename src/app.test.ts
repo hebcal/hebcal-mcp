@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isoDateStringToDate, doYahrzeit, torahPortion } from './app.js';
+import { isoDateStringToDate, doYahrzeit, torahPortion, candleLighting } from './app.js';
 import { HDate } from '@hebcal/hdate';
 
 describe('Hebcal MCP Server Functions', () => {
@@ -112,6 +112,92 @@ describe('Hebcal MCP Server Functions', () => {
       const hd = new HDate(date);
 
       expect(typeof hd.isLeapYear()).toBe('boolean');
+    });
+  });
+
+  describe('candleLighting', () => {
+    it('should return candle-lighting times for a date range', () => {
+      const result = candleLighting(
+        41.85003,
+        -87.65005,
+        'America/Chicago',
+        '2024-01-05',
+        '2024-01-13'
+      );
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(2); // Should have header rows and data
+      expect(result[0]).toContain('Date');
+      expect(result[0]).toContain('Time');
+      expect(result[0]).toContain('Type');
+      expect(result[1]).toContain('----'); // Table separator
+    });
+
+    it('should include both Candle lighting and Havdalah events', () => {
+      const result = candleLighting(
+        41.85003,
+        -87.65005,
+        'America/Chicago',
+        '2024-01-05',
+        '2024-01-13'
+      );
+
+      const text = result.join('\n');
+      expect(text).toContain('Candle lighting');
+      expect(text).toContain('Havdalah');
+    });
+
+    it('should work for Jerusalem timezone', () => {
+      const result = candleLighting(
+        31.76904,
+        35.21633,
+        'Asia/Jerusalem',
+        '2024-01-05',
+        '2024-01-13'
+      );
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(2);
+    });
+
+    it('should include associated event information', () => {
+      const result = candleLighting(
+        41.85003,
+        -87.65005,
+        'America/Chicago',
+        '2024-01-05',
+        '2024-01-13'
+      );
+
+      // Should have at least one row with associated event data
+      const dataRows = result.slice(2); // Skip header rows
+      expect(dataRows.length).toBeGreaterThan(0);
+      // Check that rows have the markdown table format with 4 columns
+      expect(dataRows[0]).toMatch(/\|.*\|.*\|.*\|.*\|/);
+    });
+
+    it('should handle different timezones', () => {
+      const chicago = candleLighting(
+        41.85003,
+        -87.65005,
+        'America/Chicago',
+        '2024-01-05',
+        '2024-01-06'
+      );
+
+      const nyc = candleLighting(
+        40.7128,
+        -74.0060,
+        'America/New_York',
+        '2024-01-05',
+        '2024-01-06'
+      );
+
+      expect(Array.isArray(chicago)).toBe(true);
+      expect(Array.isArray(nyc)).toBe(true);
+      // Both should have data
+      expect(chicago.length).toBeGreaterThan(2);
+      expect(nyc.length).toBeGreaterThan(2);
     });
   });
 });

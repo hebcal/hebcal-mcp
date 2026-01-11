@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { HDate, getYahrzeitHD } from "@hebcal/hdate";
-import { HebrewCalendar, Sedra, ParshaEvent, getHolidaysOnDate, flags, DailyLearning } from "@hebcal/core";
+import { HebrewCalendar, Sedra, ParshaEvent, getHolidaysOnDate, flags, DailyLearning, Location, Event } from "@hebcal/core";
 import { getLeyningForParshaHaShavua } from '@hebcal/leyning';
 import '@hebcal/learning';
 import dayjs from "dayjs";
@@ -90,6 +90,50 @@ export function torahPortion(dt: Date, il: boolean): string[] {
   }
   const d = dayjs(parsha.hdate.greg());
   lines.push(`Date read: ${d.format('YYYY-MM-DD')}`);
+  return lines;
+}
+
+export function candleLighting(
+  latitude: number,
+  longitude: number,
+  tzid: string,
+  startDate: string,
+  endDate: string
+): string[] {
+  const il = tzid === 'Asia/Jerusalem';
+  const location = new Location(latitude, longitude, il, tzid);
+
+  const start = isoDateStringToDate(startDate);
+  const end = isoDateStringToDate(endDate);
+
+  const events = HebrewCalendar.calendar({
+    candlelighting: true,
+    location: location,
+    start: start,
+    end: end,
+  });
+
+  const lines: string[] = [
+    '| Date | Time | Type | Associated Event |',
+    '| ---- | ---- | ---- | ---- |',
+  ];
+
+  for (const ev of events) {
+    const desc = ev.getDesc();
+    if (desc === 'Candle lighting' || desc === 'Havdalah') {
+      const hd = ev.getDate();
+      const d = dayjs(hd.greg());
+      const timeStr = ev.eventTimeStr || '';
+
+      let associated = '';
+      if (ev.linkedEvent) {
+        associated = ev.linkedEvent.render('en');
+      }
+
+      lines.push(`| ${d.format('YYYY-MM-DD')} | ${timeStr} | ${desc} | ${associated} |`);
+    }
+  }
+
   return lines;
 }
 
@@ -296,6 +340,39 @@ export function getServer(): McpServer {
             type: "text",
             uri: ev.url(),
             text: results.join('\n'),
+          },
+        ],
+      };
+    },
+  );
+
+  server.registerTool(
+    "candle-lighting",
+    {
+      description: "Generates candle-lighting and Havdalah times for a given location and date range",
+      inputSchema: {
+        latitude: z.number().min(-90).max(90).describe('Latitude as decimal, valid range -90 to +90 (e.g. 41.85003)'),
+        longitude: z.number().min(-180).max(180).describe('Longitude as decimal, valid range -180 to +180 (e.g. -87.65005)'),
+        tzid: z.string().describe('Olson timezone ID (e.g. "America/Chicago", "Europe/Moscow")'),
+        startDate: z.string().describe('Start date in yyyy-MM-dd format'),
+        endDate: z.string().describe('End date in yyyy-MM-dd format'),
+      },
+    },
+    async function ({ latitude, longitude, tzid, startDate, endDate }) {
+      let start, end;
+      try {
+        start = isoDateStringToDate(startDate);
+        end = isoDateStringToDate(endDate);
+      } catch {
+        return errorCard(`Error parsing dates: ${startDate} or ${endDate}`);
+      }
+
+      const lines = candleLighting(latitude, longitude, tzid, startDate, endDate);
+      return {
+        content: [
+          {
+            type: "text",
+            text: lines.join('\n'),
           },
         ],
       };
