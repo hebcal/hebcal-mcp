@@ -22,7 +22,7 @@ function errorCard(message: string): any {
 /**
  * Parse a string YYYY-MM-DD and return Date
  */
-function isoDateStringToDate(str: string): Date {
+export function isoDateStringToDate(str: string): Date {
   if (!reIsoDate.test(str)) {
     throw new RangeError(`Date does not match format YYYY-MM-DD: ${str}`);
   }
@@ -36,7 +36,7 @@ function isoDateStringToDate(str: string): Date {
   return dt;
 }
 
-function doYahrzeit(dt: Date, afterSunset: boolean): string[] {
+export function doYahrzeit(dt: Date, afterSunset: boolean): string[] {
   let origHd = new HDate(dt);
   if (afterSunset) {
     origHd = origHd.next();
@@ -69,7 +69,7 @@ function doYahrzeit(dt: Date, afterSunset: boolean): string[] {
   return lines;
 }
 
-function torahPortion(dt: Date, il: boolean): string[] {
+export function torahPortion(dt: Date, il: boolean): string[] {
   const hd = new HDate(dt);
   const sedra = new Sedra(hd.getFullYear(), il);
   const parsha = sedra.lookup(hd);
