@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { HDate, getYahrzeitHD } from "@hebcal/hdate";
-import { HebrewCalendar, Sedra, ParshaEvent, getHolidaysOnDate, flags, DailyLearning, Location, Event } from "@hebcal/core";
+import { HebrewCalendar, Sedra, ParshaEvent, getHolidaysOnDate, flags, DailyLearning, Location, Event, TimedEvent } from "@hebcal/core";
 import { getLeyningForParshaHaShavua } from '@hebcal/leyning';
 import '@hebcal/learning';
 import dayjs from "dayjs";
@@ -121,13 +121,14 @@ export function candleLighting(
   for (const ev of events) {
     const desc = ev.getDesc();
     if (desc === 'Candle lighting' || desc === 'Havdalah') {
-      const hd = ev.getDate();
+      const timedEv = ev as TimedEvent;
+      const hd = timedEv.getDate();
       const d = dayjs(hd.greg());
-      const timeStr = ev.eventTimeStr || '';
+      const timeStr = timedEv.eventTimeStr || '';
 
       let associated = '';
-      if (ev.linkedEvent) {
-        associated = ev.linkedEvent.render('en');
+      if (timedEv.linkedEvent) {
+        associated = timedEv.linkedEvent.render('en');
       }
 
       lines.push(`| ${d.format('YYYY-MM-DD')} | ${timeStr} | ${desc} | ${associated} |`);

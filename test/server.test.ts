@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import request from 'supertest';
 import express, { Express } from 'express';
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { getServer } from './app.js';
+import { getServer } from '../src/app.js';
 
 // Helper function to parse SSE response and extract JSON-RPC message
 function parseSSE(sseText: string): any {

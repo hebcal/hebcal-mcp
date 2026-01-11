@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isoDateStringToDate, doYahrzeit, torahPortion, candleLighting } from './app.js';
+import { isoDateStringToDate, doYahrzeit, torahPortion, candleLighting } from '../src/app.js';
 import { HDate } from '@hebcal/hdate';
 
 describe('Hebcal MCP Server Functions', () => {
