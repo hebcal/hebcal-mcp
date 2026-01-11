@@ -348,9 +348,9 @@ export function getServer(): McpServer {
   );
 
   server.registerTool(
-    "candle-lighting",
+    "shabbat-times",
     {
-      description: "Generates candle-lighting and Havdalah times for a given location and date range",
+      description: "Generates Shabbat and holiday candle-lighting and Havdalah times for a given location and date range",
       inputSchema: {
         latitude: z.number().min(-90).max(90).describe('Latitude as decimal, valid range -90 to +90 (e.g. 41.85003)'),
         longitude: z.number().min(-180).max(180).describe('Longitude as decimal, valid range -180 to +180 (e.g. -87.65005)'),

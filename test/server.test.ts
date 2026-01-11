@@ -91,7 +91,7 @@ describe('MCP Server HTTP Integration Tests', () => {
       expect(toolNames).toContain('torah-portion');
       expect(toolNames).toContain('jewish-holidays-year');
       expect(toolNames).toContain('daf-yomi');
-      expect(toolNames).toContain('candle-lighting');
+      expect(toolNames).toContain('shabbat-times');
     });
 
     it('should convert Gregorian to Hebrew date', async () => {
@@ -273,7 +273,7 @@ describe('MCP Server HTTP Integration Tests', () => {
           jsonrpc: '2.0',
           method: 'tools/call',
           params: {
-            name: 'candle-lighting',
+            name: 'shabbat-times',
             arguments: {
               latitude: 41.85003,
               longitude: -87.65005,
