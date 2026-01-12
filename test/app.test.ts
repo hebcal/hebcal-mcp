@@ -174,6 +174,11 @@ describe('Hebcal MCP Server Functions', () => {
       expect(dataRows.length).toBeGreaterThan(0);
       // Check that rows have the markdown table format with 4 columns
       expect(dataRows[0]).toMatch(/\|.*\|.*\|.*\|.*\|/);
+      const [_, date, time, type, associated] = dataRows[0].split('|').map(col => col.trim());
+      expect(date).toBe('2024-01-05');
+      expect(time).toBe('16:15');
+      expect(type).toBe('Candle lighting');
+      expect(associated).toBe('Parashat Shemot');
     });
 
     it('should handle different timezones', () => {
@@ -198,6 +203,35 @@ describe('Hebcal MCP Server Functions', () => {
       // Both should have data
       expect(chicago.length).toBeGreaterThan(2);
       expect(nyc.length).toBeGreaterThan(2);
+    });
+
+    it('should return candle lighting times for Pesach week 2026', () => {
+      const result = candleLighting(
+        41.85003,
+        -87.65005,
+        'America/Chicago',
+        '2026-03-29',
+        '2026-04-04'
+      );
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(2);
+
+      // Should have candle lighting for April 1 (Pesach)
+      expect(result[2]).toContain('2026-04-01');
+      expect(result[2]).toContain('Candle lighting');
+      expect(result[2]).toContain('Erev Pesach');
+
+      // Should have candle lighting for April 2 (Second day Pesach)
+      expect(result[3]).toContain('2026-04-02');
+      expect(result[3]).toContain('Pesach I');
+
+      // Should have candle lighting for April 3 (Shabbat)
+      expect(result[4]).toContain('2026-04-03');
+
+      // Should have Havdalah for April 4
+      expect(result[5]).toContain('2026-04-04');
+      expect(result[5]).toContain('Havdalah');
     });
   });
 });

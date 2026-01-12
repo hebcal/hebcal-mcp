@@ -111,6 +111,7 @@ export function candleLighting(
     location: location,
     start: start,
     end: end,
+    sedrot: true,
   });
 
   const lines: string[] = [
@@ -129,6 +130,8 @@ export function candleLighting(
       let associated = '';
       if (timedEv.linkedEvent) {
         associated = timedEv.linkedEvent.render('en');
+      } else if (timedEv.memo) {
+        associated = timedEv.memo;
       }
 
       lines.push(`| ${d.format('YYYY-MM-DD')} | ${timeStr} | ${desc} | ${associated} |`);
