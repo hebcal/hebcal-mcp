@@ -128,10 +128,10 @@ export function candleLighting(
       const timeStr = timedEv.eventTimeStr || '';
 
       let associated = '';
-      if (timedEv.linkedEvent) {
-        associated = timedEv.linkedEvent.render('en');
-      } else if (timedEv.memo) {
+      if (timedEv.memo) {
         associated = timedEv.memo;
+      } else if (timedEv.linkedEvent) {
+        associated = timedEv.linkedEvent.render('en');
       }
 
       lines.push(`| ${d.format('YYYY-MM-DD')} | ${timeStr} | ${desc} | ${associated} |`);
