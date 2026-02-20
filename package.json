@@ -21,7 +21,7 @@
     "@hebcal/hdate": "^0.21.1",
     "@hebcal/learning": "^6.6.1",
     "@hebcal/leyning": "^9.4.0",
-    "@modelcontextprotocol/sdk": "^1.25.3",
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "dayjs": "^1.11.19",
     "express": "^5.2.1",
     "pino": "^10.3.0",
