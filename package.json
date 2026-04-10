@@ -4,7 +4,18 @@
   "mcpName": "io.github.hebcal/hebcal",
   "description": "Model Context Protocol extension for Hebrew calendar",
   "type": "module",
-  "main": "server.js",
+  "main": "build/server.js",
+  "bin": {
+    "hebcal-mcp": "build/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hebcal/hebcal-mcp.git"
+  },
+  "homepage": "https://github.com/hebcal/hebcal-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/hebcal/hebcal-mcp/issues"
+  },
   "scripts": {
     "build": "npx tsgo",
     "start": "node build/server.js",
