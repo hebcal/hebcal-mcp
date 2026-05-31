@@ -1,6 +1,6 @@
 {
   "name": "@hebcal/mcp",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "mcpName": "io.github.hebcal/hebcal",
   "description": "Model Context Protocol extension for Hebrew calendar",
   "type": "module",
@@ -29,12 +29,12 @@
   "author": "Michael J. Radwin",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "@hebcal/core": "^6.5.0",
-    "@hebcal/hdate": "^0.22.2",
-    "@hebcal/learning": "^6.8.0",
+    "@hebcal/core": "^6.5.2",
+    "@hebcal/hdate": "^0.22.3",
+    "@hebcal/learning": "^6.9.2",
     "@hebcal/leyning": "^9.5.4",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "dayjs": "^1.11.20",
+    "dayjs": "^1.11.21",
     "express": "^5.2.1",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
@@ -43,11 +43,11 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
-    "@types/node": "^25.7.0",
+    "@types/node": "^25.9.1",
     "@types/supertest": "^7.2.0",
-    "@typescript/native-preview": "^7.0.0-dev.20260513.1",
-    "@vitest/ui": "^4.1.6",
+    "@typescript/native-preview": "^7.0.0-dev.20260527.2",
+    "@vitest/ui": "^4.1.7",
     "supertest": "^7.2.2",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.7"
   }
 }
