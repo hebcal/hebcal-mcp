@@ -29,10 +29,10 @@
   "author": "Michael J. Radwin",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "@hebcal/core": "^6.5.2",
-    "@hebcal/hdate": "^0.22.3",
-    "@hebcal/learning": "^6.9.2",
-    "@hebcal/leyning": "^9.5.4",
+    "@hebcal/core": "^6.5.3",
+    "@hebcal/hdate": "^0.22.4",
+    "@hebcal/learning": "^6.9.5",
+    "@hebcal/leyning": "^9.5.5",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "dayjs": "^1.11.21",
     "express": "^5.2.1",
@@ -43,11 +43,11 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "@types/supertest": "^7.2.0",
-    "@typescript/native-preview": "^7.0.0-dev.20260527.2",
-    "@vitest/ui": "^4.1.7",
+    "@typescript/native-preview": "^7.0.0-dev.20260607.1",
+    "@vitest/ui": "^4.1.8",
     "supertest": "^7.2.2",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.8"
   }
 }
