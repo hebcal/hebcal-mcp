@@ -1,9 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { HDate, getYahrzeitHD } from "@hebcal/hdate";
-if (typeof (globalThis as {Temporal?: unknown}).Temporal === 'undefined') {
-  await import('temporal-polyfill/global');
-}
 import { HebrewCalendar, Sedra, ParshaEvent, getHolidaysOnDate, flags, DailyLearning, Location, TimedEvent } from "@hebcal/core";
 import { getLeyningForParshaHaShavua } from '@hebcal/leyning';
 import '@hebcal/learning';
