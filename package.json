@@ -17,7 +17,7 @@
     "url": "https://github.com/hebcal/hebcal-mcp/issues"
   },
   "scripts": {
-    "build": "npx tsgo",
+    "build": "tsc",
     "start": "node build/server.js",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -30,7 +30,7 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "@hebcal/core": "^6.6.0",
-    "@hebcal/hdate": "^0.22.4",
+    "@hebcal/hdate": "^0.22.5",
     "@hebcal/learning": "^6.9.5",
     "@hebcal/leyning": "^9.5.5",
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -42,11 +42,11 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
-    "@types/node": "^26.0.0",
+    "@types/node": "^26.1.1",
     "@types/supertest": "^7.2.0",
-    "@typescript/native-preview": "^7.0.0-dev.20260619.1",
-    "@vitest/ui": "^4.1.9",
+    "@vitest/ui": "^4.1.10",
     "supertest": "^7.2.2",
-    "vitest": "^4.1.9"
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
   }
 }
