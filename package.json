@@ -29,10 +29,10 @@
   "author": "Michael J. Radwin",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "@hebcal/core": "^6.8.2",
-    "@hebcal/hdate": "^0.22.5",
+    "@hebcal/core": "^6.9.1",
+    "@hebcal/hdate": "^0.22.7",
     "@hebcal/learning": "^6.9.5",
-    "@hebcal/leyning": "^9.6.0",
+    "@hebcal/leyning": "^10.0.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "dayjs": "^1.11.21",
     "express": "^5.2.1",
