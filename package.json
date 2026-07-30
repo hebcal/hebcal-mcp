@@ -31,7 +31,7 @@
   "dependencies": {
     "@hebcal/core": "^6.9.1",
     "@hebcal/hdate": "^0.22.7",
-    "@hebcal/learning": "^6.9.5",
+    "@hebcal/learning": "^6.9.7",
     "@hebcal/leyning": "^10.0.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "dayjs": "^1.11.21",
