@@ -7,8 +7,13 @@
     "outDir": "./build",
     "rootDir": "./src",
     "sourceMap": false,
+    // Load-bearing: thread-stream's .d.ts references a worker_threads export
+    // that @types/node doesn't have. Upstream bug, already on the latest version,
+    // so there is nothing to upgrade to. Without this, the build fails on an error
+    // we cannot fix. Prefer removing it if that is ever resolved — it is what
+    // hides unresolvable imports in dependency .d.ts files, which silently
+    // degrade their types to `any`.
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
     "strict": true,
     "paths": {
       "*": ["./types/*"]
